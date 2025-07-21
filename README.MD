@@ -111,14 +111,18 @@ Since grafana is deployed in docker (like the other services) you may not be abl
 | Service                   | URL                                    |
 |---------------------------|----------------------------------------|
 | API (Swagger)             | http://localhost:8080/swagger          |
-| Svelte - Frontend         | http://localhost:8080                  |
-| Svelte - Request Password | http://localhost:8080/request-password |
 | Grafana                   | http://localhost:3000                  |
 | Prometheus                | http://localhost:9090                  |
 | Tempo (Traces)            | http://localhost:3200                  |
 | Loki (Logs)               | http://localhost:3100                  |
 
 This is how the services can be addressed when deployed via Docker compose. In the case of Kubernetes, either further port adaptations or port forwarding are necessary.
+
+## Outlook
+This project demonstrates a simple platform engineering template. 
+In the future, this could be complemented by a customized CI/CD pipeline to test the project, scan for security vulnerabilities (SonarQube, OWASP) and easily deploy to the cloud. 
+Secrets and credentials could also be injected from the pipeline. As an alternative to Grafana self-hosted, the project could also be connected to the Grafana cloud to reduce complexity. 
+Instead of using AspNet.Identity's own login mechanism, you could rely on a provider such as KeyCloak or communicate directly with AWS-Cognito.
 
 ## Contributing
 Feel free to submit pull requests or open issues!
