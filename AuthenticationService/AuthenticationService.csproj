@@ -16,15 +16,6 @@
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-rc.1.24451.1" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.0" />
         <PackageReference Include="RazorLight" Version="2.3.1" />
         <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />

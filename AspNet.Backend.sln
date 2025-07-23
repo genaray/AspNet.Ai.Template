@@ -21,30 +21,9 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "k8s", "k8s", "{66D602F5-11C
 	ProjectSection(SolutionItems) = preProject
 		k8s\authentication_postgres.yaml = k8s\authentication_postgres.yaml
 		k8s\authentication_service.yaml = k8s\authentication_service.yaml
-		k8s\grafana_service.yaml = k8s\grafana_service.yaml
-		k8s\grafana_values.yaml = k8s\grafana_values.yaml
 		k8s\kustomization.yaml = k8s\kustomization.yaml
-		k8s\loki_service.yaml = k8s\loki_service.yaml
-		k8s\loki_values.yaml = k8s\loki_values.yaml
-		k8s\otel_collector_configmap.yaml = k8s\otel_collector_configmap.yaml
-		k8s\otel_collector_service.yaml = k8s\otel_collector_service.yaml
-		k8s\otel_collector_values.yaml = k8s\otel_collector_values.yaml
-		k8s\prometheus_service.yaml = k8s\prometheus_service.yaml
-		k8s\prometheus_values.yaml = k8s\prometheus_values.yaml
-		k8s\tempo_service.yaml = k8s\tempo_service.yaml
-		k8s\tempo_values.yaml = k8s\tempo_values.yaml
 		k8s\user_postgres.yaml = k8s\user_postgres.yaml
 		k8s\user_service.yaml = k8s\user_service.yaml
-	EndProjectSection
-EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Observability", "Observability", "{2CB56AAB-9F1B-42EE-B537-19ADBD6BC4F9}"
-	ProjectSection(SolutionItems) = preProject
-		Observability\grafana_aspnet_dashboard.json = Observability\grafana_aspnet_dashboard.json
-		Observability\grafana-datasources.yml = Observability\grafana-datasources.yml
-		Observability\loki.yml = Observability\loki.yml
-		Observability\otel-collector.yml = Observability\otel-collector.yml
-		Observability\prometheus.yml = Observability\prometheus.yml
-		Observability\tempo.yml = Observability\tempo.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Terraform", "Terraform", "{41DC8522-8995-46FD-B5EA-B51D891179CA}"
@@ -86,7 +65,6 @@ Global
 	GlobalSection(NestedProjects) = preSolution
 		{5B1A8AF9-B778-415C-8CC4-E98C1EC22B4E} = {0BA89E81-1216-4CC0-84BC-8FE008BA2229}
 		{66D602F5-11C4-4FDD-8D19-CF2027A11F11} = {0BA89E81-1216-4CC0-84BC-8FE008BA2229}
-		{2CB56AAB-9F1B-42EE-B537-19ADBD6BC4F9} = {0BA89E81-1216-4CC0-84BC-8FE008BA2229}
 		{41DC8522-8995-46FD-B5EA-B51D891179CA} = {0BA89E81-1216-4CC0-84BC-8FE008BA2229}
 		{9F17238F-6D81-4C0F-B9AC-01E772363375} = {0BA89E81-1216-4CC0-84BC-8FE008BA2229}
 	EndGlobalSection

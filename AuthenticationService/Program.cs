@@ -8,10 +8,6 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
 using HealthCheckService = AuthenticationService.Feature.HealthCheck.HealthCheckService;
 
 [assembly: InternalsVisibleTo("AuthenticationService.Tests")]
@@ -44,62 +40,6 @@ public class Program
         builder.Services.AddScoped<EmailService>();
         builder.Services.AddScoped<Feature.Authentication.AuthenticationService>();
         builder.Services.AddScoped<UserCredentialsService>();
-        
-        // Connect to otel-collector to send data
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.SetResourceBuilder(
-                            ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                            .AddAttributes(new Dictionary<string, object>
-                            {
-                                { "host.name", Environment.MachineName }
-                            })
-                        )    
-                        .AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel")
-                        .AddAspNetCoreInstrumentation()
-                        .AddHttpClientInstrumentation()
-                        .AddRuntimeInstrumentation()
-                        .AddProcessInstrumentation()
-                        .AddOtlpExporter((opt, reader) =>
-                        {
-                            opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                            opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                            reader.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5000; // Important, otherwhise we lose data if intervall is too high
-                        });
-            }).WithTracing(tracing =>
-            {
-                tracing.SetResourceBuilder(
-                            ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                            .AddAttributes(new Dictionary<string, object>
-                            {
-                                { "host.name", Environment.MachineName }
-                            })
-                        ) 
-                        .AddAspNetCoreInstrumentation(options => { options.RecordException = true; })
-                        .AddEntityFrameworkCoreInstrumentation()
-                        .AddHttpClientInstrumentation()
-                        .AddOtlpExporter(opt =>
-                        {
-                            opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                            opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                        });
-            }).WithLogging(logging =>
-                {
-                    logging.SetResourceBuilder(
-                                ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                                .AddAttributes(new Dictionary<string, object>
-                                {
-                                    { "host.name", Environment.MachineName }
-                                })
-                            ) 
-                            .AddOtlpExporter(opt =>
-                            {
-                                opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                                opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                            });
-                }
-            );
         
         // Health check
         builder.Services.AddHealthChecks().AddCheck<HealthCheckService>(nameof(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckService));

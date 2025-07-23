@@ -11,6 +11,19 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
 {
     public DbSet<User> Users { get; set; }
 
+    protected override void OnModelCreating(ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+        
+        // To snake case
+        foreach (var entity in modelBuilder.Model.GetEntityTypes())
+        {
+            entity.SetTableName(entity.GetTableName()?.ToLower());
+            foreach (var prop in entity.GetProperties())
+                prop.SetColumnName(prop.GetColumnName().ToLower());
+        }
+    }
+
     /// <summary>
     ///     Seed users and roles in the Identity database.
     /// </summary>
@@ -23,6 +36,26 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
         const int maxRetries = 3;
         const int delayMs = 1000; 
         var attempt = 0;
+        
+        /*// Add user
+        var user = new User
+        {
+            Id = "123",
+            FirstName = "Admin",
+            LastName = "",
+        };
+
+        try
+        {
+            context.Users.Add(user);
+            await context.SaveChangesAsync();
+        }
+        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
+        {
+            logger.LogWarning("Admin user already exists. Skipping insert.");
+        }*/
+
+        // return;
         
         if (!context.Users.Any())
         {

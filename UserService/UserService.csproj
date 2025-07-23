@@ -9,25 +9,22 @@
     </PropertyGroup>
 
     <ItemGroup>
+        <PackageReference Include="LangChain.Extensions.DependencyInjection" Version="0.17.1-dev.51" />
         <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="8.0.12" />
         <PackageReference Include="Microsoft.AspNetCore.Identity.EntityFrameworkCore" Version="8.0.12" />
         <PackageReference Include="Microsoft.EntityFrameworkCore" Version="9.0.0-rc.1.24451.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Analyzers" Version="9.0.0-rc.1.24451.1" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.InMemory" Version="8.0.11" />
         <PackageReference Include="Microsoft.EntityFrameworkCore.Relational" Version="9.0.0-rc.1.24451.1" />
+        <PackageReference Include="ModelContextProtocol.AspNetCore" Version="0.3.0-preview.3" />
         <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="9.0.0-rc.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.Console" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Exporter.Prometheus.AspNetCore" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.11.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.AspNetCore" Version="1.11.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.EntityFrameworkCore" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Http" Version="1.11.0" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Process" Version="1.11.0-beta.1" />
-        <PackageReference Include="OpenTelemetry.Instrumentation.Runtime" Version="1.11.0" />
+        <PackageReference Include="Polly.Extensions.Http" Version="3.0.0" />
         <PackageReference Include="RazorLight" Version="2.3.1" />
         <PackageReference Include="Riok.Mapperly" Version="4.1.1" />
         <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
+        <PackageReference Include="LangChain.Core" Version="0.17.1-dev.51" />
+        <PackageReference Include="LangChain.Providers.OpenAI" Version="0.17.1-dev.48" />
+        <PackageReference Include="LangChain.Databases.Postgres" Version="0.17.1-dev.11" />
     </ItemGroup>
 
     <ItemGroup>

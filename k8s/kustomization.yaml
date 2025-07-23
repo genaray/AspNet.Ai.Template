@@ -12,12 +12,6 @@ namespace: default
 
 # To deploy all at once: kubectl apply -k .
 resources:
-  - prometheus_service.yaml
-  - tempo_service.yaml
-  - loki_service.yaml
-  - otel_collector_configmap.yaml
-  - otel_collector_service.yaml
-  - grafana_service.yaml
   - authentication_postgres.yaml
   - authentication_service.yaml
   - user_postgres.yaml

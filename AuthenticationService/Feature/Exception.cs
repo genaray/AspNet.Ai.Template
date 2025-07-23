@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
-using OpenTelemetry.Trace;
 using Shared;
 
 namespace AuthenticationService.Feature;

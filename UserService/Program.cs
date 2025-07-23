@@ -5,13 +5,14 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
-using OpenTelemetry.Logs;
-using OpenTelemetry.Metrics;
-using OpenTelemetry.Resources;
-using OpenTelemetry.Trace;
+using ModelContextProtocol.AspNetCore;
 using UserService.Feature.AppUser;
 using UserService.Feature.Authentication;
+using UserService.Feature.Mcp;
 using HealthCheckService = UserService.Feature.HealthCheck.HealthCheckService;
+using LangChain.Extensions.DependencyInjection;
+using Microsoft.Extensions.Options;
+using UserService.Feature.LangChain;
 
 [assembly: InternalsVisibleTo("AuthenticationService.Tests")]
 namespace UserService;
@@ -31,71 +32,30 @@ public class Program
         builder.Services.AddEndpointsApiExplorer();
         builder.Services.AddSwaggerGen();
         
+        // Extract settings
+        builder.Services.Configure<McpSettings>(builder.Configuration.GetSection("McpService"));
+        
         // Http-Connection to AuthService
         builder.Services.AddHttpClient<IAuthClient, AuthClient>(client =>
         {
             // Address of service e.g. url or kubernetes service name
-            client.BaseAddress = new Uri(builder.Configuration["AuthService:BaseUrl"]);
+            client.BaseAddress = new Uri(builder.Configuration["AuthService:BaseUrl"] ?? throw new ArgumentException("AuthService:BaseUrl is not set."));
+        });
+        
+        // Http-Connection to McpService (itself)
+        builder.Services.AddHttpClient<LangChainService>( (sp, client) =>
+        {
+            var mcpSettings = sp.GetRequiredService<IOptions<McpSettings>>().Value;
+            client.BaseAddress = new Uri(mcpSettings.BaseUrl ?? throw new ArgumentException("McpService:BaseUrl is not set."));
         });
         
         // Custom services
         builder.Services.AddScoped<Feature.AppUser.UserService>();
         
-        // Connect to otel-collector to send data
-        builder.Services.AddOpenTelemetry()
-            .WithMetrics(metrics =>
-            {
-                metrics.SetResourceBuilder(
-                            ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                            .AddAttributes(new Dictionary<string, object>
-                            {
-                                { "host.name", Environment.MachineName }
-                            })
-                        )    
-                        .AddMeter("Microsoft.AspNetCore.Hosting", "Microsoft.AspNetCore.Server.Kestrel")
-                        .AddAspNetCoreInstrumentation()
-                        .AddHttpClientInstrumentation()
-                        .AddRuntimeInstrumentation()
-                        .AddProcessInstrumentation()
-                        .AddOtlpExporter((opt, reader) =>
-                        {
-                            opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                            opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                            reader.PeriodicExportingMetricReaderOptions.ExportIntervalMilliseconds = 5000; // Important, otherwhise we lose data if intervall is too high
-                        });
-            }).WithTracing(tracing =>
-            {
-                tracing.SetResourceBuilder(
-                            ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                            .AddAttributes(new Dictionary<string, object>
-                            {
-                                { "host.name", Environment.MachineName }
-                            })
-                        ) 
-                        .AddAspNetCoreInstrumentation(options => { options.RecordException = true; })
-                        .AddEntityFrameworkCoreInstrumentation()
-                        .AddHttpClientInstrumentation()
-                        .AddOtlpExporter(opt =>
-                        {
-                            opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                            opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                        });
-            }).WithLogging(logging =>
-                {
-                    logging.SetResourceBuilder(
-                                ResourceBuilder.CreateDefault().AddService(serviceName: Name, serviceVersion: System.Reflection.Assembly.GetEntryAssembly()?.GetName().Version?.ToString(3))
-                                .AddAttributes(new Dictionary<string, object>
-                                {
-                                    { "host.name", Environment.MachineName }
-                                })
-                            ) 
-                            .AddOtlpExporter(opt =>
-                            {
-                                opt.Endpoint = new Uri("http://otel-collector:4317"); // OTLP-Endpoint Otel-Collector
-                                opt.Protocol = OpenTelemetry.Exporter.OtlpExportProtocol.Grpc; // Http for 4318
-                            });
-                }
-            );
+        // AI
+        builder.Services.AddMcpServer().WithHttpTransport().WithTools<McpUserTools>().WithTools<EchoTool>().WithToolsFromAssembly();
+        builder.Services.AddOpenAi();
+        builder.Services.AddAnthropic();
         
         // Health check
         builder.Services.AddHealthChecks().AddCheck<HealthCheckService>(nameof(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckService));
@@ -217,6 +177,7 @@ public class Program
         // 5. API-Endpoints
         app.MapControllers();
         app.MapHealthChecks("/health");
+        app.MapMcp("/api/mcp/invoke");
 
         // 6. SPA‑Fallback for static files
         app.MapFallbackToFile("index.html");

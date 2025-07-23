@@ -20,13 +20,31 @@ public class GetUserCredentialsByIdResponse
     public string Id { get; set; } = null!;
 }
 
+/// <summary>
+/// Interface for the authentication service client.
+/// </summary>
 public interface IAuthClient
 {
+    /// <summary>
+    /// Registers a user's credentials with the authentication service.
+    /// </summary>
+    /// <param name="username">The username.</param>
+    /// <param name="email">The user's email.</param>
+    /// <param name="password">The user's password.</param>
+    /// <returns>A <see cref="RegisterResponse"/> indicating the result of the operation.</returns>
     Task<RegisterResponse> RegisterUserCredentialsAsync(string username, string email, string password);
 
+    /// <summary>
+    /// Gets a user's credentials ID by their email.
+    /// </summary>
+    /// <param name="email">The user's email.</param>
+    /// <returns>A <see cref="RegisterResponse"/> containing the user's ID if found.</returns>
     Task<RegisterResponse> GetUserCredentialsIdByEmail(string email);
 }
 
+/// <summary>
+/// Client to communicate with the authentication service.
+/// </summary>
 public class AuthClient : IAuthClient
 {
     private readonly HttpClient _http;
@@ -36,9 +54,16 @@ public class AuthClient : IAuthClient
         _http = http;
     }
 
+    /// <summary>
+    /// Registers a user's credentials with the authentication service.
+    /// </summary>
+    /// <param name="username">The username.</param>
+    /// <param name="email">The user's email.</param>
+    /// <param name="password">The user's password.</param>
+    /// <returns>A <see cref="RegisterResponse"/> indicating the result of the operation.</returns>
     public async Task<RegisterResponse> RegisterUserCredentialsAsync(string username, string email, string password)
     {
-        // DTO, das im AuthService erwartet wird
+        // DTO that is expected in the AuthService
         var dto = new
         {
             Username = username,
@@ -70,6 +95,11 @@ public class AuthClient : IAuthClient
         };
     }
     
+    /// <summary>
+    /// Gets a user's credentials ID by their email.
+    /// </summary>
+    /// <param name="email">The user's email.</param>
+    /// <returns>A <see cref="RegisterResponse"/> containing the user's ID if found.</returns>
     public async Task<RegisterResponse> GetUserCredentialsIdByEmail(string email)
     {
         // Call auth service
