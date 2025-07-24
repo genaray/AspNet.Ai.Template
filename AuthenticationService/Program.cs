@@ -3,12 +3,16 @@ using System.Text;
 using AuthenticationService.Feature.Email;
 using AuthenticationService.Feature.Frontend;
 using AuthenticationService.Feature.UserCredentials;
+using AuthenticationService.Feature.UserServiceProxy;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using HealthCheckService = AuthenticationService.Feature.HealthCheck.HealthCheckService;
+using Polly;
+using Polly.Extensions.Http;
 
 [assembly: InternalsVisibleTo("AuthenticationService.Tests")]
 namespace AuthenticationService;
@@ -33,6 +37,7 @@ public class Program
         // Map appsettings to setting classes
         builder.Services.Configure<EmailSettings>(builder.Configuration.GetSection("Email"));
         builder.Services.Configure<FrontendSettings>(builder.Configuration.GetSection("Frontend"));
+        builder.Services.Configure<UserServiceSettings>(builder.Configuration.GetSection("UserService"));
         
         // Custom services
         builder.Services.AddScoped<EmailTemplateRenderer>();
@@ -40,6 +45,19 @@ public class Program
         builder.Services.AddScoped<EmailService>();
         builder.Services.AddScoped<Feature.Authentication.AuthenticationService>();
         builder.Services.AddScoped<UserCredentialsService>();
+        
+        // Http-Connection to UserService for LangChainProxy
+        builder.Services.AddHttpClient<UserServiceProxyService>( (sp, client) =>
+        {
+            var userServiceSettings = sp.GetRequiredService<IOptions<UserServiceSettings>>().Value;
+            client.BaseAddress = new Uri(userServiceSettings.BaseUrl ?? throw new ArgumentException("UserService:BaseUrl is not set."));
+        })
+        .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(new[]
+        {
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(10)
+        }));
         
         // Health check
         builder.Services.AddHealthChecks().AddCheck<HealthCheckService>(nameof(Microsoft.Extensions.Diagnostics.HealthChecks.HealthCheckService));

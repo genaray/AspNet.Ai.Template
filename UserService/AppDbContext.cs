@@ -33,59 +33,20 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
     /// <returns></returns>
     public static async Task SeedAsync(ILogger<AppDbContext> logger, AppDbContext context, IAuthClient client)
     {
-        const int maxRetries = 3;
-        const int delayMs = 1000; 
-        var attempt = 0;
-        
-        /*// Add user
-        var user = new User
-        {
-            Id = "123",
-            FirstName = "Admin",
-            LastName = "",
-        };
-
-        try
-        {
-            context.Users.Add(user);
-            await context.SaveChangesAsync();
-        }
-        catch (DbUpdateException ex) when (IsUniqueConstraintViolation(ex))
-        {
-            logger.LogWarning("Admin user already exists. Skipping insert.");
-        }*/
-
-        // return;
-        
         if (!context.Users.Any())
         {
-            // Retry loop
-            RegisterResponse? response = null;
-            while (attempt < maxRetries)
+            var response = await client.GetUserCredentialsIdByEmail("admin@example.com");
+
+            if (!response.Result.Success)
             {
-                response = await client.GetUserCredentialsIdByEmail("admin@example.com");
-
-                // Success, break
-                if (response.Result.Success)
-                {
-                    break;
-                }
-
-                attempt++;
-                if (attempt >= maxRetries)
-                {
-                    logger.LogError("Could not fetch User from AuthenticationService after {Attempts} attempts.", attempt);
-                    throw new InvalidOperationException($"Could not fetch User from AuthenticationService.");
-                }
-
-                // Pause
-                await Task.Delay(delayMs);
+                logger.LogError("Could not fetch User from AuthenticationService.");
+                throw new InvalidOperationException("Could not fetch User from AuthenticationService.");
             }
 
             // Add user
             var adminUser = new User
             {
-                Id = response!.UserId,
+                Id = response.UserId,
                 FirstName = "Admin",
                 LastName = "",
             };
@@ -99,7 +60,7 @@ public class AppDbContext(DbContextOptions<AppDbContext> options) : DbContext(op
             {
                 logger.LogWarning("Admin user already exists. Skipping insert.");
             }
-            logger.LogInformation("Fetched {User} after {Attempts} attempts.", adminUser, attempt);;
+            logger.LogInformation("Fetched {User}.", adminUser);
         }
     }
     

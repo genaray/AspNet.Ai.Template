@@ -6,6 +6,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using ModelContextProtocol.AspNetCore;
+using Polly;
+using Polly.Extensions.Http;
 using UserService.Feature.AppUser;
 using UserService.Feature.Authentication;
 using UserService.Feature.Mcp;
@@ -39,8 +41,15 @@ public class Program
         builder.Services.AddHttpClient<IAuthClient, AuthClient>(client =>
         {
             // Address of service e.g. url or kubernetes service name
-            client.BaseAddress = new Uri(builder.Configuration["AuthService:BaseUrl"] ?? throw new ArgumentException("AuthService:BaseUrl is not set."));
-        });
+            client.BaseAddress = new Uri(builder.Configuration["AuthService:BaseUrl"] ??
+                                         throw new ArgumentException("AuthService:BaseUrl is not set."));
+        })
+        .AddTransientHttpErrorPolicy(policyBuilder => policyBuilder.WaitAndRetryAsync(new[]
+        {
+            TimeSpan.FromSeconds(1),
+            TimeSpan.FromSeconds(5),
+            TimeSpan.FromSeconds(10)
+        }));
         
         // Http-Connection to McpService (itself)
         builder.Services.AddHttpClient<LangChainService>( (sp, client) =>

@@ -24,6 +24,7 @@ public class LangChainController(LangChainService langChainService) : Controller
     public async Task<ActionResult<string>> GetUsers(string input)
     {
         var output = await langChainService.ProcessAsync(input);
+        output = output.Trim('"');
         return Ok(output);
     }
 }
