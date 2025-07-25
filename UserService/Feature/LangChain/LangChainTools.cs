@@ -28,7 +28,6 @@ public class McpTool(McpSettings mcpSettings, HttpClient client) : AgentTool("mc
     public override async Task<string> ToolTask(string input, CancellationToken token = new())
     {
         var response = await client.GetAsync($"/{mcpSettings.Tools}", token);
-        Console.WriteLine(response.ToString());
         return await response.Content.ReadAsStringAsync(token);
     }
 }

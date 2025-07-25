@@ -15,7 +15,7 @@ The Project includes:
 - **Kubernetes** Pods, deployment, services and co to orchestrate, scale and run everything.
 - **Terraform** to create AWS resources (including EKS) and populate them with the Kubernetes services.
 
-![Chatting with the LLm to control the Backend](images/Ui.png)
+![Chatting with the LLm to control the Backend](images/UI.png)
 
 ## Prerequisites
 - [Ansible](https://docs.ansible.com/ansible/latest/installation_guide/intro_installation.html#installing-and-upgrading-ansible)
